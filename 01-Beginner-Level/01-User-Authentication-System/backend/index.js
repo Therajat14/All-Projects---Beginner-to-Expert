@@ -3,6 +3,7 @@ const User = require("./models/users");
 const app = express();
 const bodyParser = require("body-parser");
 const UserValidation = require("./utils/validation/userValidation");
+const genHashedPassword = require("./utils/hash");
 
 require("dotenv").config();
 
@@ -10,7 +11,8 @@ app.use(bodyParser.json());
 
 app.post("/signup", async (req, res) => {
   try {
-    const { name, email, age, password } = req.body;
+    const { name, email, age } = req.body;
+    let password = req.body.password;
 
     // Validate request body with Zod
     const validationResult = UserValidation.safeParse(req.body);
@@ -25,6 +27,9 @@ app.post("/signup", async (req, res) => {
         .status(409)
         .json({ msg: "User with this email already exists" });
     }
+
+    // HASHED Password
+    password = await genHashedPassword(password);
 
     // Create new user
     const newUser = new User({ name, email, age, password });
