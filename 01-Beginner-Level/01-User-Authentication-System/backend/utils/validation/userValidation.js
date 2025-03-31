@@ -1,6 +1,6 @@
 const z = require("zod");
 
-const UserValidation = z.object({
+const userSignUpValidation = z.object({
   name: z.string().min(5, { message: "Must be 5 or more characters long" }),
   email: z.string().email({ message: "Invalid email address" }),
   age: z.number({
@@ -12,4 +12,11 @@ const UserValidation = z.object({
     .min(6, { message: "Password must be at least 6 characters" }),
 });
 
-module.exports = UserValidation;
+const userLogInValidation = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters" }),
+});
+
+module.exports = { userSignUpValidation, userLogInValidation };
