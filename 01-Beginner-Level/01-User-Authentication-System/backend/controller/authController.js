@@ -4,6 +4,7 @@ const {
 } = require("../utils/validation/userValidation");
 const { genHashedPassword, isMatch } = require("../utils/hash");
 const User = require("../models/users");
+const token = require("../utils/jwt");
 
 // SIGN UP ROUTE
 const signUp = async (req, res) => {
@@ -33,9 +34,10 @@ const signUp = async (req, res) => {
 
     // Save user to DB
     await newUser.save();
+    jwtToken = token({ name, email, age, password });
     res
       .status(201)
-      .json({ msg: "User registered successfully!", user: newUser });
+      .json({ msg: "User registered successfully!", user: newUser, jwtToken });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -68,8 +70,12 @@ const logIn = async (req, res) => {
       res.status(400).json({ message: "Invalid credentials" });
 
     // GENRATE AND SEND JSON WEB TOKEN
+    jwtToken = token({ email, password });
 
-    res.send("Login SUccess");
+    res.json({
+      msg: existingUser.name + " Welcome to website your token is : ",
+      jwtToken,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
     console.log("Err");
