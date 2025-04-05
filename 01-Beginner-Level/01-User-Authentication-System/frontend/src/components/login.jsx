@@ -1,12 +1,22 @@
 import { Link } from "react-router";
+import { useContext } from "react";
+import { UserContext } from "../userContext";
 
 const Login = () => {
+  const { userEmail, userPassword, setUserEmail, setUserPassword } =
+    useContext(UserContext);
+  const handeleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Submitted");
+    setUserEmail("");
+    setUserPassword("");
+  };
   return (
     <section className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md rounded-lg border-2 border-amber-300 p-6 shadow-md shadow-amber-700">
         <h1 className="mb-4 text-center text-3xl font-semibold">Login</h1>
 
-        <form className="space-y-3">
+        <form className="space-y-3" onSubmit={handeleSubmit}>
           <input
             type="email"
             id="email"
@@ -14,6 +24,10 @@ const Login = () => {
             className="w-full rounded border p-2"
             required
             placeholder="Email"
+            value={userEmail}
+            onChange={(e) => {
+              setUserEmail(e.target.value);
+            }}
           />
 
           <input
@@ -23,6 +37,10 @@ const Login = () => {
             className="w-full rounded border p-2"
             required
             placeholder="Password"
+            value={userPassword}
+            onChange={(e) => {
+              setUserPassword(e.target.value);
+            }}
           />
 
           <button
