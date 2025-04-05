@@ -1,16 +1,64 @@
-import { Link } from "react-router";
-import { useContext } from "react";
+import { Link, Navigate } from "react-router";
+import { useContext, useEffect } from "react";
 import { UserContext } from "../userContext";
+import axios from "axios";
+import { useNavigate } from "react-router";
 
 const Login = () => {
-  const { userEmail, userPassword, setUserEmail, setUserPassword } =
-    useContext(UserContext);
-  const handeleSubmit = (e) => {
+  const {
+    userEmail,
+    userPassword,
+    setUserEmail,
+    setUserPassword,
+    setUserData,
+  } = useContext(UserContext);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      navigate("/dashboard");
+    }
+    // } else {
+    //   // Optionally, fetch user data from backend using token
+    //   // For now, let's just set a message
+    //   setUserData("Rajat! You are logged in successfully 🎉");
+    // }
+  }, [navigate]);
+
+  const handeleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted");
+    try {
+      const res = await axios({
+        method: "post",
+        url: "http://localhost:5000/login",
+
+        data: {
+          email: userEmail,
+          password: userPassword,
+        },
+      });
+
+      setTimeout(() => {
+        alert(res.data.message);
+      }, 100);
+      setUserData(res.data);
+
+      localStorage.setItem("token", res.data.token);
+
+      navigate("/dashboard");
+      console.log(res.data);
+    } catch (error) {
+      console.log(error.response.data.message);
+      alert(error.response.data.message);
+    }
+
     setUserEmail("");
     setUserPassword("");
   };
+
   return (
     <section className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md rounded-lg border-2 border-amber-300 p-6 shadow-md shadow-amber-700">
