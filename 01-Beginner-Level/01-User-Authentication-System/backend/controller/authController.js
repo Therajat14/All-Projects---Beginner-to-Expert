@@ -4,7 +4,8 @@ const {
 } = require("../utils/validation/userValidation");
 const { genHashedPassword, isMatch } = require("../utils/hash");
 const User = require("../models/users");
-const token = require("../utils/jwt");
+const {token, authenticateToken} = require("../utils/jwt");
+
 
 // SIGN UP ROUTE
 const signUp = async (req, res) => {
@@ -47,39 +48,62 @@ const signUp = async (req, res) => {
 
 const logIn = async (req, res) => {
   try {
-    // Validate User Login Inputs;
+    // Validate User Login Inputs
     const validationResult = userLogInValidation.safeParse(req.body);
-
-    if (!validationResult.success)
-      res.send("Creadiental type Validation Error");
-
-    // Check if the user exist...
+    if (!validationResult.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Credential type Validation Error",
+      });
+    }
 
     const { email, password } = req.body;
 
+    // Check if the user exists
     const existingUser = await User.findOne({ email });
-
-    if (!existingUser)
-      res.json({
-        msg: "User Not Found",
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
+    }
 
-    // Check For Password
+    // Check Password
     const isPasswordCorrect = await isMatch(password, existingUser);
-    if (!isPasswordCorrect)
-      res.status(400).json({ message: "Invalid credentials" });
+    if (!isPasswordCorrect) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
 
-    // GENRATE AND SEND JSON WEB TOKEN
-    jwtToken = token({ email, password });
+    // Generate and send JWT (only include necessary info)
+    const jwtToken = token({ userName: existingUser.name, email: existingUser.email,age: existingUser.age, id: existingUser._id });
 
-    res.json({
-      msg: existingUser.name + " Welcome to website your token is : ",
-      jwtToken,
+    return res.status(200).json({
+      success: true,
+      age: existingUser.age,
+      name : existingUser.name,
+      message: `${existingUser.name}, welcome to the website!`,
+      token: jwtToken,
+    
     });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
-    console.log("Err");
+    console.error(error.message); // ✅ Log error
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });z
   }
 };
 
-module.exports = { signUp, logIn };
+const user =(req, res)=>{
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+   const user = authenticateToken(token);
+   res.json(user);
+}
+
+
+module.exports = { signUp, logIn , user};
