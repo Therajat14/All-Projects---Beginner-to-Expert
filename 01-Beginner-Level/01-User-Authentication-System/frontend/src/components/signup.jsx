@@ -1,6 +1,19 @@
 import { Link } from "react-router-dom";
+import { UserContext } from "../userContext";
+import { useContext } from "react";
 
 const SignUp = () => {
+  const {
+    userName,
+    setUserName,
+    userAge,
+    setUserAge,
+    userEmail,
+    setUserEmail,
+    userPassword,
+    setUserPassword,
+  } = useContext(UserContext);
+
   return (
     <section className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md rounded-lg border-2 border-amber-300 p-6 shadow-md shadow-amber-700">
@@ -14,8 +27,11 @@ const SignUp = () => {
             className="w-full rounded border p-2"
             required
             placeholder="Full Name"
+            value={userName}
+            onChange={(e) => {
+              setUserName(e.target.value);
+            }}
           />
-
           <input
             type="email"
             id="email"
@@ -23,16 +39,23 @@ const SignUp = () => {
             className="w-full rounded border p-2"
             required
             placeholder="Email"
+            value={userEmail}
+            onChange={(e) => {
+              setUserEmail(e.target.value);
+            }}
           />
-
           <input
-            type="date"
+            type="number"
             id="dob"
             name="dob"
             className="w-full rounded border p-2"
+            placeholder="Age"
             required
+            value={userAge}
+            onChange={(e) => {
+              setUserAge(e.target.value);
+            }}
           />
-
           <input
             type="password"
             id="password"
@@ -40,6 +63,10 @@ const SignUp = () => {
             className="w-full rounded border p-2"
             required
             placeholder="Password"
+            value={userPassword}
+            onChange={(e) => {
+              setUserPassword(e.target.value);
+            }}
           />
 
           <button
