@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "./userContext";
 import axios from "axios";
@@ -7,7 +7,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { userData, setUserData } = useContext(UserContext);
   const token = localStorage.getItem("token");
-  console.log(token);
+  const [sessionTimeout, setSessionTimeout] = useState("");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -16,7 +16,7 @@ const Dashboard = () => {
         navigate("/login");
         return;
       }
-      console.log("hi there");
+
       const res = await axios({
         method: "post",
         url: "http://localhost:5000/user",
@@ -31,7 +31,7 @@ const Dashboard = () => {
       setUserData(res.data);
 
       console.log(userData);
-      console.log(res.data);
+
       // try {
       //   const response = await axios.get("http://localhost:5000/user", {
       //     headers: {
@@ -59,7 +59,14 @@ const Dashboard = () => {
     };
 
     fetchUserData();
-  }, [navigate, setUserData]);
+  }, []);
+
+  setInterval(() => {
+    const remainingTime = userData.exp - Math.floor(Date.now() / 1000);
+    setSessionTimeout(remainingTime);
+    console.log(remainingTime);
+    // if (!remainingTime) handleLogout();
+  }, 1000);
 
   const handleLogout = async (logOutMessage = "Logged out successfully!") => {
     localStorage.removeItem("token");
@@ -73,10 +80,13 @@ const Dashboard = () => {
     <div className="border-2 border-amber-600 p-4 text-center">
       <h1 className="mb-4 text-xl font-bold text-white">Dashboard</h1>
 
-      <div className="mb-4 rounded bg-amber-900 p-4 text-left text-sm text-green-400">
-        <p>
-          <strong>Name:</strong> {userData.userName}
-        </p>
+      <div className="mb-4 bg-amber-900 p-4 text-left text-sm text-yellow-100">
+        <div className="flex w-full flex-row justify-between">
+          <p>
+            <strong>Name:</strong> {userData.userName}
+          </p>
+          <p>Session Timeout in :{sessionTimeout}</p>
+        </div>
         <p>
           <strong>Age:</strong> {userData.age}
         </p>
@@ -84,7 +94,7 @@ const Dashboard = () => {
           <strong>Message:</strong> {userData.message}
         </p>
         <p className="break-words">
-          <strong>Token:</strong> {token}
+          <strong>Token:</strong> <span className="text-xs"> {token}</span>
         </p>
       </div>
 
