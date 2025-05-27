@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 
 const bookSchema = new mongoose.Schema(
   {
+    srNo: {
+      type: Number,
+    },
     title: {
       type: String,
       required: [true, "Book title is required"],
