@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import Book from "../models/bookModel.js";
 
 export const getAllBooks = async (req, res) => {
@@ -81,13 +80,6 @@ export const addNewBook = async (req, res) => {
 
 export const getBookById = async (req, res) => {
   try {
-    const id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(404).json({
-        success: false,
-        message: `Invalid book ID format: ${id}`,
-      });
-    }
     const book = await Book.findById(id);
 
     if (!book) {
@@ -112,12 +104,6 @@ export const getBookById = async (req, res) => {
 export const deleteBookById = async (req, res) => {
   const id = req.params.id;
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({
-      success: false,
-      message: `Invalid book ID format: ${id}`,
-    });
-  }
   try {
     const deletedBook = await Book.findByIdAndDelete(id);
 
@@ -145,13 +131,6 @@ export const deleteBookById = async (req, res) => {
 
 export const updateBookById = async (req, res) => {
   const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({
-      success: false,
-      message: `Invalid book ID foramat : ${id}`,
-    });
-  }
 
   try {
     const updatedBook = await Book.findByIdAndUpdate(

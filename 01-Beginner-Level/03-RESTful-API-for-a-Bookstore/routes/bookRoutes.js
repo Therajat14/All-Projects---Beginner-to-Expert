@@ -1,4 +1,6 @@
 import express from "express";
+import { validateObjectId } from "../middlewares/validateObjectId.js";
+
 const router = express.Router();
 
 import {
@@ -10,9 +12,9 @@ import {
 } from "../controllers/bookControllers.js";
 
 router.get("/", getAllBooks);
-router.get("/:id", getBookById);
+router.get("/:id", validateObjectId, getBookById);
 router.post("/", addNewBook);
-router.put("/:id", updateBookById);
-router.delete("/:id", deleteBookById);
+router.put("/:id", validateObjectId, updateBookById);
+router.delete("/:id", validateObjectId, deleteBookById);
 
 export default router;
