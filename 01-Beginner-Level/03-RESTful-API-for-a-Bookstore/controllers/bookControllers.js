@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import Book from "../models/bookModel.js";
-import { error } from "console";
 
 export const getAllBooks = async (req, res) => {
   try {
@@ -35,8 +34,15 @@ export const addNewBook = async (req, res) => {
     } = req.body;
 
     if (
-      (!title || !author || !description || !genre || price == null,
-      stock == null || !image || !publisher || !publishedDate)
+      !title ||
+      !author ||
+      !description ||
+      !genre ||
+      price == null ||
+      stock == null ||
+      !image ||
+      !publisher ||
+      !publishedDate
     )
       return res.status(400).json({
         success: false,
@@ -77,7 +83,7 @@ export const getBookById = async (req, res) => {
   try {
     const id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
         message: `Invalid book ID format: ${id}`,
       });
@@ -96,7 +102,7 @@ export const getBookById = async (req, res) => {
       data: book,
     });
   } catch (err) {
-    res.status(404).json({
+    res.status(500).json({
       success: false,
       msg: `The book with  this id (${req.params.id}) can't be found`,
     });
