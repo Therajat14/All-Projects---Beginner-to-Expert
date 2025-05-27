@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Book from "../models/bookModel.js";
 
 export const getAllBooks = async (req, res) => {
@@ -71,66 +72,66 @@ export const addNewBook = async (req, res) => {
   }
 };
 
-// export const addNewBook = async (req, res) => {
-//   try {
-//     const {
-//       title,
-//       author,
-//       description,
-//       genre,
-//       price,
-//       stock,
-//       image,
-//       rating,
-//       numReviews,
-//       reviews,
-//       publisher,
-//       publishedDate,
-//     } = req.body;
+export const getBookById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid book ID format: ${id}`,
+      });
+    }
+    const book = await Book.findById(id);
 
-//     // Basic required field validation (can be expanded)
-//     if (
-//       !title ||
-//       !author ||
-//       !description ||
-//       !genre ||
-//       price == null ||
-//       stock == null
-//     ) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Please provide all required fields",
-//       });
-//     }
+    if (!book) {
+      return res.status(404).json({
+        success: false,
+        message: `No book found with ID: ${id}`,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Book retrieved successfully",
+      data: book,
+    });
+  } catch (err) {
+    res.status(404).json({
+      success: false,
+      msg: `The book with  this id (${req.params.id}) can't be found`,
+    });
+  }
+};
 
-//     const book = new Book({
-//       title,
-//       author,
-//       description,
-//       genre,
-//       price,
-//       stock,
-//       image,
-//       rating,
-//       numReviews,
-//       reviews,
-//       publisher,
-//       publishedDate,
-//     });
+export const deleteBookById = async (req, res) => {
+  const id = req.params.id;
 
-//     const createdBook = await book.save();
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      success: false,
+      message: `Invalid book ID format: ${id}`,
+    });
+  }
+  try {
+    const deletedBook = await Book.findByIdAndDelete(id);
 
-//     res.status(201).json({
-//       success: true,
-//       message: "Book created successfully",
-//       data: createdBook,
-//     });
-//   } catch (err) {
-//     console.error("Error creating book:", err);
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to create book",
-//       error: err.message,
-//     });
-//   }
-// };
+    if (!deletedBook) {
+      return res.status(404).json({
+        success: false,
+        msg: `Can't find any element by this id ${id}`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      msg: `Book deleted by id ${id} success`,
+      deletedBook,
+    });
+  } catch (err) {
+    console.error("Delete error:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error while deleting book",
+      error: err.message,
+    });
+  }
+};
