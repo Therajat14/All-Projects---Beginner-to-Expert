@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Book from "../models/bookModel.js";
+import { error } from "console";
 
 export const getAllBooks = async (req, res) => {
   try {
@@ -131,6 +132,46 @@ export const deleteBookById = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Server error while deleting book",
+      error: err.message,
+    });
+  }
+};
+
+export const updateBookById = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      success: false,
+      message: `Invalid book ID foramat : ${id}`,
+    });
+  }
+
+  try {
+    const updatedBook = await Book.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedBook) {
+      return res
+        .status(404)
+        .json({ success: false, message: `No book found for this id (${id})` });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `The book has been successfully Updated`,
+      data: updatedBook,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating book",
       error: err.message,
     });
   }
