@@ -5,8 +5,13 @@ import connectDB from "./utils/db.js";
 import router from "./routes/bookRoutes.js";
 import morgan from "morgan";
 import helmet from "helmet";
+import swaggerUi from "swagger-ui-express";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const swaggerDocument = require("./swagger.json");
 
 const app = express();
+
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(
@@ -18,7 +23,7 @@ app.use(
 connectDB();
 
 app.use("/books", router);
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use((req, res, next) => {
   res.status(404).json({ success: false, message: "Route not found" });
 });
